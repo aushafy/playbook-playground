@@ -1,0 +1,65 @@
+- name: Update apt
+  apt: update_cache=yes
+
+- name: update apt-get using traditional command
+  action: shell apt-get update
+
+- name: install required basic packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - vim
+    - git
+    - zip
+    - unzip
+    - wget
+    - apt-show-versions
+    - apt-transport-https
+    - curl
+    - apache2
+    - mariadb-server
+    - mariadb-client
+    - php
+    - php-mysql
+    - php-curl
+    - php-gd
+    - php-mbstring 
+    - php-xml 
+    - php-xmlrpc 
+    - php-soap 
+    - php-intl 
+    - php-zip
+
+- name: run apache2 service
+  service:
+    name: apache2
+    enabled: true
+
+- name: run mysqld service
+  service:
+    name: mysql
+    enabled: true
+
+- name: Create a new database for wordpress
+  community.mysql.mysql_db:
+    name: wordpress
+    state: present
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+- name: Download latest wordpress from official site
+  ansible.builtin.get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: /tmp
+    mode: '0755'
+
+- name: extract wordpress to /var/www/html
+  ansible.builtin.unarchive:
+    src: /tmp/wordpress-6.0.2.tar.gz
+    dest: /var/www/html
+    remote_src: yes
+
+- name: restart apache2
+  service:
+    name: apache2
+    state: restarted

@@ -1,0 +1,11 @@
+- name: install database package
+  hosts: wordpress.aushafy.id
+  connection: ssh
+  become: True
+  become_user: root
+
+  vars_files:
+    - wordpress/vars/main.yaml
+
+  tasks:
+    - include: wordpress/tasks/main.yaml
